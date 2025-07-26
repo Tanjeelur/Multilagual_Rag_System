@@ -34,10 +34,31 @@ def initialize_pipeline():
     Returns:
         Tuple[Embedder, Storage]: Initialized embedder and storage objects.
     """
+    def is_story_line(line):
+        # Remove empty lines and lines with only whitespace
+        if not line.strip():
+            return False
+        # Remove known repeated headers/artifacts
+        if "অনলাহন ব্যাচ বাংলা ইংরেজি:" in line:
+            return False
+        # Remove lines with only numbers or symbols
+        if line.strip().isdigit():
+            return False
+        # Keep all lines with Bengali characters
+        bengali_chars = sum(0x0980 <= ord(c) <= 0x09FF for c in line)
+        if bengali_chars > 0:
+            return True
+        return False
+
     try:
         # Extract and process PDF
         pages = extract_text_from_pdf(PDF_PATH)
-        cleaned_pages = [clean_text(page) for page in pages]
+        # Apply story line cleaning to each page
+        cleaned_pages = []
+        for page in pages:
+            lines = page.splitlines()
+            story_lines = [line for line in lines if is_story_line(line)]
+            cleaned_pages.append("\n".join(story_lines))
         all_chunks = []
         page_numbers = []
         for page_num, page in enumerate(cleaned_pages, 1):

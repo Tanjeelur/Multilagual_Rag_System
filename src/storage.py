@@ -39,7 +39,7 @@ class Storage:
                     CREATE TABLE IF NOT EXISTS chunks (
                         id UUID PRIMARY KEY,
                         text TEXT,
-                        embedding VECTOR(768),
+                        embedding VECTOR(384),
                         page INTEGER
                     );
                 """)

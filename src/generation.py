@@ -72,38 +72,36 @@ class Generator:
             Tuple[str, float]: Generated answer and confidence score.
         """
         try:
-            context = "\n".join([chunk[1] for chunk in chunks])
-            # Format prompt properly for mT5 model
-            # Include language information in a way that's clear but not overly formatted
+            # Join all chunk texts for context
+            context = "\n".join([chunk[1] for chunk in chunks if chunk[1].strip()])
             lang_name = "Bengali" if language == "bn" else "English"
-            prompt = f"Answer this question in {lang_name}: {query}\n\nReference information: {context}"
-            
-            # Use smaller input and output sizes to reduce memory usage
-            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=256)
-            
-            # Set up decoder_input_ids to avoid <extra_id_0> token generation
+            # Prompt engineering: require a full-sentence answer using only the context
+            prompt = (
+                f"You are a helpful assistant answering questions about Bengali literature. "
+                f"Answer the following question in {lang_name} using only the information provided below. "
+                f"If the answer is not present, reply 'উত্তর পাওয়া যায়নি' (Answer not found).\n"
+                f"Question: {query}\n"
+                f"Context: {context}\n"
+                f"Answer in a complete sentence."
+            )
+            # Tokenize and generate
+            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
             decoder_start_token_id = self.model.config.decoder_start_token_id
             decoder_input_ids = torch.ones((1, 1), dtype=torch.long) * decoder_start_token_id
-            
-            # Generate with more memory-efficient settings and proper decoder setup
             outputs = self.model.generate(
                 input_ids=inputs.input_ids,
                 attention_mask=inputs.attention_mask,
                 decoder_input_ids=decoder_input_ids,
-                max_length=50,
-                num_beams=2,  # Reduce beam size
+                max_length=128,
+                num_beams=4,
                 early_stopping=True,
                 no_repeat_ngram_size=2,
-                length_penalty=1.0
+                length_penalty=1.2
             )
-            # Free memory immediately after generation
             torch.cuda.empty_cache() if torch.cuda.is_available() else None
             answer = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-            
-            # Clean the output to remove any remaining <extra_id> tokens
             answer = self._clean_output(answer)
-
-            # Calculate confidence (average cosine similarity)
+            # Confidence calculation
             query_embedding = embedder.embed([query])[0]
             chunk_embeddings = embedder.embed([chunk[1] for chunk in chunks])
             similarities = [
@@ -111,7 +109,6 @@ class Generator:
                 for emb in chunk_embeddings
             ]
             confidence = np.mean(similarities) if similarities else 0.0
-
             logger.info(f"Generated answer: {answer} with confidence {confidence}")
             return answer, confidence
         except Exception as e:

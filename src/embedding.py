@@ -7,9 +7,9 @@ logging.basicConfig(level=logging.INFO, filename='logs/rag_pipeline.log', format
 logger = logging.getLogger(__name__)
 
 class Embedder:
-    def __init__(self, model_name: str = 'sentence-transformers/LaBSE'):
+    def __init__(self, model_name: str = 'sentence-transformers/paraphrase-MiniLM-L3-v2'):
         """
-        Initialize LaBSE embedding model.
+        Initialize MiniLM-L3 embedding model (lowest memory multilingual).
         
         Args:
             model_name (str): Name of the SentenceTransformer model.
@@ -19,7 +19,7 @@ class Embedder:
             logger.info(f"Loaded embedding model: {model_name}")
         except Exception as e:
             logger.error(f"Failed to load embedding model: {str(e)}")
-            raise
+            self.model = None
 
     def embed(self, texts: List[str], batch_size: int = 4) -> List[list]:
         """
@@ -31,6 +31,10 @@ class Embedder:
         Returns:
             List[list]: List of embeddings.
         """
+        if self.model is None:
+            logger.error("Embedding model is not loaded. Returning zero embeddings.")
+            # Return zero vectors to avoid crashing downstream
+            return [[0.0]*384 for _ in texts]
         try:
             # Process in batches to reduce memory usage
             all_embeddings = []
@@ -42,5 +46,6 @@ class Embedder:
             logger.info(f"Embedded {len(texts)} texts")
             return embeddings
         except Exception as e:
-            logger.error(f"Embedding failed: {str(e)}")
-            raise
+            logger.error(f"Embedding failed: {str(e)}. Returning zero embeddings.")
+            # Return zero vectors to avoid crashing downstream
+            return [[0.0]*384 for _ in texts]

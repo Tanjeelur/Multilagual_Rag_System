@@ -74,7 +74,7 @@ def extract_text_from_pdf(pdf_path: str) -> List[str]:
 
 def _extract_with_pdf2image(pdf_path: str) -> List[str]:
     """Extract text using pdf2image and easyocr for best OCR quality."""
-    reader = easyocr.Reader(['bn', 'en'], gpu=False)
+    reader = easyocr.Reader(['bn', 'en'], gpu=True)
     with tempfile.TemporaryDirectory() as temp_dir:
         logger.info(f"Converting PDF to images with pdf2image: {pdf_path}")
         images = convert_from_path(
@@ -100,7 +100,7 @@ def _extract_with_pdf2image(pdf_path: str) -> List[str]:
 
 def _extract_with_pymupdf(pdf_path: str) -> List[str]:
     """Extract text using PyMuPDF and easyocr as fallback."""
-    reader = easyocr.Reader(['bn', 'en'], gpu=False)
+    reader = easyocr.Reader(['bn', 'en'], gpu=True)
     doc = fitz.open(pdf_path)
     pages = []
     for page_num, page in enumerate(doc, 1):
