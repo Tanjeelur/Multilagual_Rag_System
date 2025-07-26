@@ -1,0 +1,29 @@
+# FastAPI and Web Framework
+fastapi
+uvicorn
+python-multipart
+pydantic
+
+# Machine Learning & NLP
+torch
+sentence-transformers
+transformers
+openai
+
+# PDF Processing & OCR
+pdf2image
+Pillow
+easyocr
+opencv-python
+
+# Database & Storage
+psycopg2-binary
+redis
+
+# Text Processing
+numpy
+regex
+
+# Utilities
+python-dotenv
+pytest
