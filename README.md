@@ -110,6 +110,7 @@ text
 
 ## Project Structure
 
+```
 multilingual_rag_system/
 ├── config/ # Configuration settings
 ├── src/ # Core source code
@@ -126,7 +127,7 @@ multilingual_rag_system/
 ├── run_server.py # Server startup script
 ├── client_example.py # API client example
 └── requirements.txt # Dependencies
-
+```
 text
 
 ## Configuration
@@ -151,11 +152,11 @@ Edit `config/settings.py` to customize:
 - `Tell me about Anupam's character.`
 
 ## System Architecture
+```
 
 ┌─────────────────┐ ┌──────────────────┐ ┌─────────────────┐
-│ FastAPI │ │ Core RAG │ │ Memory │
-│ Server │◄──►│ System │◄──►│ Systems │
-│ │ │ │ │ │
+│ FastAPI │ │ Core RAG │ │ Memory Systems │
+│ Server │---->│ System │---->│ Systems │
 └─────────────────┘ └──────────────────┘ └─────────────────┘
 │ │ │
 ▼ ▼ ▼
@@ -163,8 +164,62 @@ Edit `config/settings.py` to customize:
 │ API Client │ │ Processing │ │ Vector DB │
 │ (Web/Mobile) │ │ Pipeline │ │ (PostgreSQL) │
 └─────────────────┘ └──────────────────┘ └─────────────────┘
+```
 
 text
+
+# Project Pipeline
+
+This diagram illustrates the flow of data and components in the **Multilingual RAG System**:
+```
+
+Client Request
+│
+▼
+┌─────────────┐ Process PDF → ┌────────────────┐
+│ API Client │ ───────────────────► │ Data Processing │
+└─────────────┘ └────────────────┘
+│ │
+▼ ▼
+┌─────────────┐ Vectorize Data → ┌────────────────┐
+│ FastAPI │ ─────────────────────► │ Vectorization │
+│ Server │ └────────────────┘
+└─────────────┘ │
+│ ▼
+▼ ┌────────────────┐
+┌─────────────┐ Retrieve Document │ Document │
+│ Core RAG │ ───────────────────► │ Retrieval │
+│ System │ └────────────────┘
+└─────────────┘ │
+│ ▼
+▼ ┌────────────────┐
+┌─────────────┐ Generate Response │ Response │
+│ Memory │ ───────────────────► │ Generation │
+│ Systems │ └────────────────┘
+└─────────────┘ │
+│ ▼
+▼ ┌────────────────┐
+┌─────────────┐ │ Final Output │
+│ Vector DB │ ─────────────────────► └────────────────┘
+│ (PostgreSQL)│
+└─────────────┘
+```
+
+markdown
+Copy
+Edit
+
+## Data Flow Breakdown
+
+- **API Client**: Initiates the request to the FastAPI server.
+- **FastAPI Server**: Receives the request and routes it to the appropriate service.
+- **Data Processing**: Handles any PDF processing and cleaning before vectorization.
+- **Vectorization**: Converts the processed data into vector embeddings and stores them.
+- **Document Retrieval**: Retrieves the relevant document or context based on the vectorized data.
+- **Memory Systems**: Stores long-term and short-term memory for context and user interaction.
+- **Response Generation**: Generates the response based on the retrieved documents and memory.
+- **Vector DB (PostgreSQL)**: Stores the document vectors and enables fast retrieval for processing.
+- **Final Output**: Returns the generated response back to the client.
 
 ## Performance
 
