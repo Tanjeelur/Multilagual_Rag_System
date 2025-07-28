@@ -15,6 +15,37 @@ A comprehensive Retrieval-Augmented Generation (RAG) system that supports both B
 🌐 **FastAPI Server**: RESTful API with comprehensive endpoints  
 📊 **Comprehensive Logging**: Detailed logging and error handling  
 
+## Questions & Answers
+
+### 1. What method or library did you use to extract the text, and why? Did you face any formatting challenges with the PDF content?
+
+I used **EasyOCR** to extract text from PDF files by first converting each page into an image. The reason for using EasyOCR was its ability to handle complex scripts like Bengali effectively. The major challenge I encountered was that the provided PDF fonts were not Unicode-supported, which caused the text extraction to break down when trying to use **PyMuPDF** (for directly extracting text from the PDF). The Bengali text would not render correctly and would appear garbled. This issue was mitigated by converting the PDF to images first and then applying OCR.
+
+### 2. What chunking strategy did you choose (e.g., paragraph-based, sentence-based, character limit)?
+
+I used a **paragraph-based** chunking strategy. This was chosen to ensure that the extracted text maintains its context, as Bengali literature often has intricate paragraph structures that are crucial for understanding meaning.
+
+### 3. Why do you think it works well for semantic retrieval?
+
+Paragraph-based chunking works well for semantic retrieval because it keeps related ideas together, helping the model maintain contextual coherence. Since Bengali literature often has sentences that are interconnected, breaking the text into smaller chunks like sentences might lead to the loss of important context that can affect retrieval accuracy. This strategy ensures that when a query is made, the model retrieves semantically meaningful sections of the document.
+
+### 4. What embedding model did you use? Why did you choose it? How does it capture the meaning of the text?
+
+I used the **all-MiniLM-L6-v2** model for embedding the text. I chose this model because it is lightweight and supports Bengali vectorization, which was a necessity given the limited hardware configuration of my PC. However, while this model works well for many use cases, it does not perform optimally for more complex tasks, especially with languages like Bengali. A larger model, like **krutrim-ai-labs/Vyakyarth**, could improve performance by better capturing the nuanced semantics of Bengali text, as it is designed to perform better for specific languages and texts.
+
+### 5. How are you comparing the query with your stored chunks? Why did you choose this similarity method and storage setup?
+
+I compare the query with the stored chunks using **cosine similarity** between the embeddings of the query and the document chunks. Cosine similarity works well for this purpose because it measures the angle between two vectors, providing a meaningful indication of their semantic closeness. The document chunks are stored in a **PostgreSQL database** with the **pgvector extension**, which allows efficient storage and retrieval of vector embeddings, making it scalable and fast for semantic searches.
+
+### 6. How do you ensure that the question and the document chunks are compared meaningfully? What would happen if the query is vague or missing context?
+
+I ensure meaningful comparison by processing both the query and the document chunks with the same embedding model, ensuring uniformity in how they are represented in the vector space. If the query is vague or lacks context, the results may become less relevant, as the similarity scores could be low, or the model might retrieve irrelevant chunks. In such cases, improving the model with more specific training data or adding additional context (e.g., through conversation history) could help mitigate these issues.
+
+### 7. Do the results seem relevant? If not, what might improve them (e.g., better chunking, better embedding model, larger document)?
+
+The results are generally relevant but can be improved. One potential improvement is using a more powerful embedding models like **krutrim-ai-labs/Vyakyarth** and **gemini-embedding-001**, which would improve the semantic understanding of Bengali text. Additionally, experimenting with **sentence-based chunking** or increasing the **chunk size** could also enhance the quality of retrieved information. Ensuring a larger, more comprehensive document set would further improve retrieval performance.
+
+---
 ## Quick Start
 
 ### Prerequisites
