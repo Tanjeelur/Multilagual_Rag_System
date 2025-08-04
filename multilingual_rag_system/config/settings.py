@@ -19,7 +19,7 @@ PDF_PATH = BASE_DIR / "data" / "HSC26-Bangla1st-Paper.pdf"
 DB_CONFIG: Dict[str, Any] = {
     "dbname": "postgres",
     "user": "postgres.sqnqmlvoyphdfcqplmyf", 
-    "password": "IZu8Dd7pItX6jzOt",
+    "password": "POSTGRESS_PASSWORD",
     "host": "aws-0-ap-southeast-1.pooler.supabase.com",
     "port": "5432"
 }
@@ -27,7 +27,7 @@ DB_CONFIG: Dict[str, Any] = {
 # Redis configuration for short-term memory (conversation history)
 REDIS_CONFIG: Dict[str, Any] = {
     "host": "fitting-puma-60812.upstash.io",
-    "password": "Ae2MAAIjcDEzNzYzNDU1ODBmNGU0NWY2ODQ4MGQxYWY1NTExOWVhN3AxMA",
+    "password": "REDIS-PASSWORD",
     "port": 6379,
     "ssl": True
 }
